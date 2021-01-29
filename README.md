@@ -44,7 +44,7 @@ var bytes = Base64Convert.ToBytes("eg==");
 ```csharp
 using deniszykov.BaseN;
 
-var encoding = BaseNEncoding.ZBase32;
+var encoding = BaseNEncoding.Base64;
 var input = "eg==".ToCharArray();
 var output = new byte[1024];
 var decoder = encoding.GetDecoder();
