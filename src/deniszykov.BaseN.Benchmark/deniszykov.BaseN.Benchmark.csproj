@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\deniszykov.DataTransformation\deniszykov.BaseN.csproj" />
+    <ProjectReference Include="..\deniszykov.BaseN\deniszykov.BaseN.csproj" />
   </ItemGroup>
 
 </Project>

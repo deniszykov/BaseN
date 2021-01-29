@@ -1,121 +1,62 @@
 Introduction
 ============
-For historical reasons, .NET has several approaches to value conversion:
-- Explicit/Implicit operators
-- System.Convert class 
-- IConvertible interface
-- System.ComponentModel.TypeConverter
-- To, From, Parse, Create methods
-- Constructors (Uri, Guid)
-- Meta types (Enums, Nullable Types).
 
-This package combines all these approaches under one API. 
+This is BaseN encoding library. It provides simple API for converting between binary and BaseN encoded text data.  
+Also there is an implementation of `System.Text.Encoding` which provides complex streaming API with it's `Convert` methods.  
+
+(Un)desired feature of this library, any invalid symbols (e.g. line breaks) during decoding are ignored.  
 
 Installation
 ============
 ```
-Install-Package deniszykov.TypeConversion 
+Install-Package deniszykov.BaseN
 ```
 
 Usage
 ============
 
-#### TypeConversionProvider methods
+#### Utility classes
 ```csharp
-// generic
-ToType Convert<FromType, ToType>(fromValue, [format], [formatProvider]);
-bool TryConvert<FromType, ToType>(fromValue, out result, [format], [formatProvider]);
-string ConvertToString<FromType>(fromValue, [format], [formatProvider]);
+Base64Convert.ToString(bytes);
+Base64Convert.ToCharArray(bytes);
+Base64Convert.ToBytes(string); // (+ 6 overloads)
 
-// non-generic
-object Convert(fromValue, toType, fromValue, [format], [formatProvider]);
-bool TryConvert(fromValue, toType, fromValue, out result, [format], [formatProvider]);
+// and also
+// Base64UrlConvert, Base32Convert, ZBase32Convert and HexConvert with same signature
 ```
 
 ## Example
 ```csharp
-using deniszykov.TypeConversion;
+using deniszykov.BaseN;
 
-  var conversionProvider = new TypeConversionProvider();
-  var timeSpanString = "00:00:01";
-  
-  var timeSpan = conversionProvider.Convert<string, TimeSpan>(timeSpanString);
-  
-  // with default settings TimeSpan.Parse(value, format, formatProvider) 
-  // is used for conversion inside Convert<string, TimeSpan>()
+var bytes = Base64Convert.ToBytes("eg==");
+// bytes[0] -> 122
 ```
 
-## Configuration
+## Using BaseNEncoding class
 ```csharp
-using deniszykov.TypeConversion;
+using deniszykov.BaseN;
 
-var configuration = new TypeConversionProviderConfiguration
-{
-  Options = ConversionOptions.UseDefaultFormatIfNotSpecified
-};
+var encoding = BaseNEncoding.ZBase32;
+var input = "eg==".ToCharArray();
+var output = new byte[1024];
+var decoder = encoding.GetDecoder();
 
-#if NET45
-var typeConversionProvider = new TypeConversionProvider(configuration);
-#else
-var typeConversionProvider = new TypeConversionProvider(Options.Create(configuration));
-#endif
+decoder.Convert(input, 0, input.Length, output, 0, output.Length, flush: true, out var inputUsed, out var outputUsed, out var completed);
+
+// completed -> true
+// inputUsed -> 4
+// outputUsed -> 1
+// output[0] -> 122
 ```
-Or configure via DI
-```csharp
-using deniszykov.TypeConversion;
-using Microsoft.Extensions.DependencyInjection;
+There is also overload of `Convert` accepting (`char*`, `byte*`) and (`Span<char>`, `Span<byte>`).  
 
-Host.CreateDefaultBuilder().ConfigureServices(IServiceCollection services) => {
-
-  // add configuration
-  services.Configure<TypeConversionProviderConfiguration>(options =>
-  {
-    options.DefaultFormatProvider = CultureInfo.CurrentUICulture;
-  });
-
-  // register service
-  services.AddSingleton<ITypeConversionProvider, TypeConversionProvider>();
-}
-```
-
-### Providing custom conversion between types
-```csharp
-using deniszykov.TypeConversion;
-using Microsoft.Extensions.DependencyInjection;
-
-Host.CreateDefaultBuilder().ConfigureServices(IServiceCollection services) => {
-
-  services.Configure<TypeConversionProviderConfiguration>(options =>
-  {
-    // register custom conversion from Uri to string
-    options.RegisterConversion<Uri, string>((uri, format, formatProvider) => uri.OriginalString);
-  });
-  
-}
-```
-
-### Preparing for AOT runtime
-```csharp
-using deniszykov.TypeConversion;
-using Microsoft.Extensions.DependencyInjection;
-
-Host.CreateDefaultBuilder().ConfigureServices(IServiceCollection services) => {
-
-  services.Configure<TypeConversionProviderConfiguration>(options =>
-  {
-    // disable optimizations which use dynamic code generation
-    options.Options &= ~(ConversionOptions.OptimizeWithExpressions | ConversionOptions.OptimizeWithGenerics);
-  });
-  
-}
-```
-
-## Key Abstractions
+## Using custom alphabet
 
 ```csharp
-interface ITypeConversionProvider; // provides methods to get IConverter
-interface IConverter<FromType, ToType>; // converts values
-interface IConversionMetadataProvider; // provides metadata for ITypeConversionProvider
-```
+using deniszykov.BaseN;
 
+var binHex4Alphabet = new BaseNAlphabet("!"#$%&'()*+,-012345689@ABCDEFGHIJKLMNPQRSTUVXYZ[`abcdefhijklmpqr".ToCharArray());
+var encoding = new BaseNEncoding(binHex4Alphabet, "mac-binhex40");
+```
 
