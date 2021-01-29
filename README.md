@@ -1,3 +1,5 @@
+![dotnet_build](https://github.com/deniszykov/BaseN/workflows/dotnet_build/badge.svg)
+
 Introduction
 ============
 
@@ -21,8 +23,11 @@ Base64Convert.ToString(bytes);
 Base64Convert.ToCharArray(bytes);
 Base64Convert.ToBytes(string); // (+ 6 overloads)
 
-// and also
-// Base64UrlConvert, Base32Convert, ZBase32Convert and HexConvert with same signature
+// also
+// Base64UrlConvert
+// Base32Convert
+// ZBase32Convert
+// HexConvert 
 ```
 
 ## Example
@@ -49,7 +54,7 @@ decoder.Convert(input, 0, input.Length, output, 0, output.Length, flush: true, o
 // outputUsed -> 1
 // output[0] -> 122
 ```
-There is also overload of `Convert` accepting (`char*`, `byte*`) and (`Span<char>`, `Span<byte>`).  
+There is overload of `Convert` accepting pointers and `Span<T>`'s.  
 
 ## Using custom alphabet
 
