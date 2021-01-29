@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>$(NetTargetPlatforms);</TargetFrameworks>
+		<Description>BaseN binary to text converters. Base64 converter, Base64 Url-safe converter, Base32 converter, ZBase32 converter, Base16(Hex) converter.</Description>
+		<PackageReleaseNotes>
+		</PackageReleaseNotes>
+		<PackageTags>base64, Base64url, Base32, ZBase32, Base16, hex, converter, streaming converter, encoding</PackageTags>
 	</PropertyGroup>
-	<ItemGroup>
-	  <Compile Include="..\deniszykov.TypeConversion\AssemblyInfo.cs" Link="AssemblyInfo.cs" />
-	  <Compile Include="..\deniszykov.TypeConversion\JetBrains.Annotations.cs" Link="JetBrains.Annotations.cs" />
-	</ItemGroup>
 </Project>

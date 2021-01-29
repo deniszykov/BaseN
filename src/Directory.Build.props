@@ -10,10 +10,10 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<PackageProjectUrl>https://github.com/deniszykov/TypeConversion</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/deniszykov/BaseN</PackageProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Copyright>(c) Denis Zykov 2020</Copyright>
-		<RepositoryUrl>https://github.com/deniszykov/TypeConversion</RepositoryUrl>
+		<Copyright>(c) Denis Zykov 2021</Copyright>
+		<RepositoryUrl>https://github.com/deniszykov/BaseN</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		
 		<NetFrameworkBottomTarget>net45</NetFrameworkBottomTarget>

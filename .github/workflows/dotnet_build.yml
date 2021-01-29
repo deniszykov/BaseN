@@ -22,5 +22,5 @@ jobs:
       run: dotnet msbuild -t:Pack
       
     - name: Run rests
-      working-directory: ./src/deniszykov.TypeConversion.Tests/
+      working-directory: ./src/deniszykov.BaseN.Tests/
       run: dotnet test -f netcoreapp2.1
