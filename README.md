@@ -67,3 +67,6 @@ var binHex4Alphabet = new BaseNAlphabet("!\"#$%&'()*+,-012345689@ABCDEFGHIJKLMNP
 var encoding = new BaseNEncoding(binHex4Alphabet, "mac-binhex40");
 ```
 
+## Performance
+[Benchmark Code](src/deniszykov.BaseN.Benchmark/Base32EncodeBenchmarks.cs)  
+[Benchmark Result](src/deniszykov.BaseN.Benchmark/Benchmark_Results.txt)  
