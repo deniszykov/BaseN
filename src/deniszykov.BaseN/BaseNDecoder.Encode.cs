@@ -18,7 +18,7 @@ namespace deniszykov.BaseN
     partial class BaseNDecoder
     {
 #if NETCOREAPP
-		private void EncodeBase16(ReadOnlySpan<byte> input, Span<byte> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
+		private unsafe void EncodeBase16(ReadOnlySpan<byte> input, Span<byte> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
 		{
 			if (input.IsEmpty || output.IsEmpty)
 			{
@@ -33,32 +33,38 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 4;
 			const ulong ENCODING_MASK = 15;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
-			// #2: encoding whole blocks
-
-			var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
-
-			inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
-			outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
-
-			while (wholeBlocksToProcess-- > 0)
+			fixed (char* alphabetPtr = this.Alphabet.Alphabet)
+			fixed (byte* outputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(output))
+			fixed (byte* inputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(input))
 			{
-				// fill input
-				var inputBlock =
-					((ulong)input[0] << (8 * 0)) ;
+				var inputPtr = inputBytes;
+				var outputPtr = outputBytes;
 
-				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) ;
+				// #2: encoding whole blocks
 
-				// flush output
-					output[0] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[1] = (byte)((outputBlock >> (8 * 0)) & 255);
+				var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
 
-				input = input.Slice(1);
-				output = output.Slice(2);
+				inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
+				outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
+
+				while (wholeBlocksToProcess-- > 0)
+				{
+					// fill input
+					var inputBlock =
+						((ulong)inputPtr[0] << (8 * 0)) ;
+
+					// encode input
+					outputPtr[1] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+					outputPtr[0] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+
+					inputPtr += 1;
+					outputPtr += 2;
+				}
+
+				input = input.Slice(inputUsed);
+				output = output.Slice(outputUsed);
 			}
 
 			// #3: encoding any final block (partial with padding)
@@ -70,7 +76,7 @@ namespace deniszykov.BaseN
 		}
 #endif
 #if NETCOREAPP
-		private void EncodeBase16(ReadOnlySpan<byte> input, Span<char> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
+		private unsafe void EncodeBase16(ReadOnlySpan<byte> input, Span<char> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
 		{
 			if (input.IsEmpty || output.IsEmpty)
 			{
@@ -85,32 +91,38 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 4;
 			const ulong ENCODING_MASK = 15;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
-			// #2: encoding whole blocks
-
-			var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
-
-			inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
-			outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
-
-			while (wholeBlocksToProcess-- > 0)
+			fixed (char* alphabetPtr = this.Alphabet.Alphabet)
+			fixed (char* outputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(output))
+			fixed (byte* inputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(input))
 			{
-				// fill input
-				var inputBlock =
-					((ulong)input[0] << (8 * 0)) ;
+				var inputPtr = inputBytes;
+				var outputPtr = outputBytes;
 
-				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) ;
+				// #2: encoding whole blocks
 
-				// flush output
-					output[0] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[1] = (char)((outputBlock >> (8 * 0)) & 255);
+				var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
 
-				input = input.Slice(1);
-				output = output.Slice(2);
+				inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
+				outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
+
+				while (wholeBlocksToProcess-- > 0)
+				{
+					// fill input
+					var inputBlock =
+						((ulong)inputPtr[0] << (8 * 0)) ;
+
+					// encode input
+					outputPtr[1] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+					outputPtr[0] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+
+					inputPtr += 1;
+					outputPtr += 2;
+				}
+
+				input = input.Slice(inputUsed);
+				output = output.Slice(outputUsed);
 			}
 
 			// #3: encoding any final block (partial with padding)
@@ -138,7 +150,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 4;
 			const ulong ENCODING_MASK = 15;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -154,13 +166,8 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 0] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) ;
-
-				// flush output
-					output[outputOffset + 0] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 1] = (byte)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 1] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
 
 				inputOffset += 1;
 				outputOffset += 2;
@@ -194,7 +201,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 4;
 			const ulong ENCODING_MASK = 15;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -210,13 +217,8 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 0] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) ;
-
-				// flush output
-					output[outputOffset + 0] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 1] = (char)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 1] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
 
 				inputOffset += 1;
 				outputOffset += 2;
@@ -250,7 +252,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 4;
 			const ulong ENCODING_MASK = 15;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -266,13 +268,8 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 0] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) ;
-
-				// flush output
-					output[outputOffset + 0] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 1] = (byte)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 1] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
 
 				inputOffset += 1;
 				outputOffset += 2;
@@ -306,7 +303,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 4;
 			const ulong ENCODING_MASK = 15;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -322,13 +319,8 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 0] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) ;
-
-				// flush output
-					output[outputOffset + 0] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 1] = (char)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 1] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
 
 				inputOffset += 1;
 				outputOffset += 2;
@@ -347,7 +339,7 @@ namespace deniszykov.BaseN
 		}
 #endif
 #if NETCOREAPP
-		private void EncodeBase32(ReadOnlySpan<byte> input, Span<byte> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
+		private unsafe void EncodeBase32(ReadOnlySpan<byte> input, Span<byte> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
 		{
 			if (input.IsEmpty || output.IsEmpty)
 			{
@@ -362,48 +354,48 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 5;
 			const ulong ENCODING_MASK = 31;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
-			// #2: encoding whole blocks
-
-			var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
-
-			inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
-			outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
-
-			while (wholeBlocksToProcess-- > 0)
+			fixed (char* alphabetPtr = this.Alphabet.Alphabet)
+			fixed (byte* outputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(output))
+			fixed (byte* inputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(input))
 			{
-				// fill input
-				var inputBlock =
-					((ulong)input[0] << (8 * 4)) |
-					((ulong)input[1] << (8 * 3)) |
-					((ulong)input[2] << (8 * 2)) |
-					((ulong)input[3] << (8 * 1)) |
-					((ulong)input[4] << (8 * 0)) ;
+				var inputPtr = inputBytes;
+				var outputPtr = outputBytes;
 
-				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)] << (8 * 4)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)] << (8 * 5)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)] << (8 * 6)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)] << (8 * 7)) ;
+				// #2: encoding whole blocks
 
-				// flush output
-					output[0] = (byte)((outputBlock >> (8 * 7)) & 255);
-					output[1] = (byte)((outputBlock >> (8 * 6)) & 255);
-					output[2] = (byte)((outputBlock >> (8 * 5)) & 255);
-					output[3] = (byte)((outputBlock >> (8 * 4)) & 255);
-					output[4] = (byte)((outputBlock >> (8 * 3)) & 255);
-					output[5] = (byte)((outputBlock >> (8 * 2)) & 255);
-					output[6] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[7] = (byte)((outputBlock >> (8 * 0)) & 255);
+				var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
 
-				input = input.Slice(5);
-				output = output.Slice(8);
+				inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
+				outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
+
+				while (wholeBlocksToProcess-- > 0)
+				{
+					// fill input
+					var inputBlock =
+						((ulong)inputPtr[0] << (8 * 4)) |
+						((ulong)inputPtr[1] << (8 * 3)) |
+						((ulong)inputPtr[2] << (8 * 2)) |
+						((ulong)inputPtr[3] << (8 * 1)) |
+						((ulong)inputPtr[4] << (8 * 0)) ;
+
+					// encode input
+					outputPtr[7] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+					outputPtr[6] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+					outputPtr[5] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+					outputPtr[4] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+					outputPtr[3] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)]);
+					outputPtr[2] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)]);
+					outputPtr[1] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)]);
+					outputPtr[0] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)]);
+
+					inputPtr += 5;
+					outputPtr += 8;
+				}
+
+				input = input.Slice(inputUsed);
+				output = output.Slice(outputUsed);
 			}
 
 			// #3: encoding any final block (partial with padding)
@@ -415,7 +407,7 @@ namespace deniszykov.BaseN
 		}
 #endif
 #if NETCOREAPP
-		private void EncodeBase32(ReadOnlySpan<byte> input, Span<char> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
+		private unsafe void EncodeBase32(ReadOnlySpan<byte> input, Span<char> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
 		{
 			if (input.IsEmpty || output.IsEmpty)
 			{
@@ -430,48 +422,48 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 5;
 			const ulong ENCODING_MASK = 31;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
-			// #2: encoding whole blocks
-
-			var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
-
-			inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
-			outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
-
-			while (wholeBlocksToProcess-- > 0)
+			fixed (char* alphabetPtr = this.Alphabet.Alphabet)
+			fixed (char* outputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(output))
+			fixed (byte* inputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(input))
 			{
-				// fill input
-				var inputBlock =
-					((ulong)input[0] << (8 * 4)) |
-					((ulong)input[1] << (8 * 3)) |
-					((ulong)input[2] << (8 * 2)) |
-					((ulong)input[3] << (8 * 1)) |
-					((ulong)input[4] << (8 * 0)) ;
+				var inputPtr = inputBytes;
+				var outputPtr = outputBytes;
 
-				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)] << (8 * 4)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)] << (8 * 5)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)] << (8 * 6)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)] << (8 * 7)) ;
+				// #2: encoding whole blocks
 
-				// flush output
-					output[0] = (char)((outputBlock >> (8 * 7)) & 255);
-					output[1] = (char)((outputBlock >> (8 * 6)) & 255);
-					output[2] = (char)((outputBlock >> (8 * 5)) & 255);
-					output[3] = (char)((outputBlock >> (8 * 4)) & 255);
-					output[4] = (char)((outputBlock >> (8 * 3)) & 255);
-					output[5] = (char)((outputBlock >> (8 * 2)) & 255);
-					output[6] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[7] = (char)((outputBlock >> (8 * 0)) & 255);
+				var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
 
-				input = input.Slice(5);
-				output = output.Slice(8);
+				inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
+				outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
+
+				while (wholeBlocksToProcess-- > 0)
+				{
+					// fill input
+					var inputBlock =
+						((ulong)inputPtr[0] << (8 * 4)) |
+						((ulong)inputPtr[1] << (8 * 3)) |
+						((ulong)inputPtr[2] << (8 * 2)) |
+						((ulong)inputPtr[3] << (8 * 1)) |
+						((ulong)inputPtr[4] << (8 * 0)) ;
+
+					// encode input
+					outputPtr[7] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+					outputPtr[6] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+					outputPtr[5] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+					outputPtr[4] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+					outputPtr[3] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)]);
+					outputPtr[2] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)]);
+					outputPtr[1] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)]);
+					outputPtr[0] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)]);
+
+					inputPtr += 5;
+					outputPtr += 8;
+				}
+
+				input = input.Slice(inputUsed);
+				output = output.Slice(outputUsed);
 			}
 
 			// #3: encoding any final block (partial with padding)
@@ -499,7 +491,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 5;
 			const ulong ENCODING_MASK = 31;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -519,25 +511,14 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 4] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)] << (8 * 4)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)] << (8 * 5)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)] << (8 * 6)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)] << (8 * 7)) ;
-
-				// flush output
-					output[outputOffset + 0] = (byte)((outputBlock >> (8 * 7)) & 255);
-					output[outputOffset + 1] = (byte)((outputBlock >> (8 * 6)) & 255);
-					output[outputOffset + 2] = (byte)((outputBlock >> (8 * 5)) & 255);
-					output[outputOffset + 3] = (byte)((outputBlock >> (8 * 4)) & 255);
-					output[outputOffset + 4] = (byte)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 5] = (byte)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 6] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 7] = (byte)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 7] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 6] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 5] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 4] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+				output[outputOffset + 3] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)]);
 
 				inputOffset += 5;
 				outputOffset += 8;
@@ -571,7 +552,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 5;
 			const ulong ENCODING_MASK = 31;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -591,25 +572,14 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 4] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)] << (8 * 4)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)] << (8 * 5)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)] << (8 * 6)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)] << (8 * 7)) ;
-
-				// flush output
-					output[outputOffset + 0] = (char)((outputBlock >> (8 * 7)) & 255);
-					output[outputOffset + 1] = (char)((outputBlock >> (8 * 6)) & 255);
-					output[outputOffset + 2] = (char)((outputBlock >> (8 * 5)) & 255);
-					output[outputOffset + 3] = (char)((outputBlock >> (8 * 4)) & 255);
-					output[outputOffset + 4] = (char)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 5] = (char)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 6] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 7] = (char)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 7] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 6] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 5] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 4] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+				output[outputOffset + 3] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)]);
 
 				inputOffset += 5;
 				outputOffset += 8;
@@ -643,7 +613,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 5;
 			const ulong ENCODING_MASK = 31;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -663,25 +633,14 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 4] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)] << (8 * 4)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)] << (8 * 5)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)] << (8 * 6)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)] << (8 * 7)) ;
-
-				// flush output
-					output[outputOffset + 0] = (byte)((outputBlock >> (8 * 7)) & 255);
-					output[outputOffset + 1] = (byte)((outputBlock >> (8 * 6)) & 255);
-					output[outputOffset + 2] = (byte)((outputBlock >> (8 * 5)) & 255);
-					output[outputOffset + 3] = (byte)((outputBlock >> (8 * 4)) & 255);
-					output[outputOffset + 4] = (byte)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 5] = (byte)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 6] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 7] = (byte)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 7] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 6] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 5] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 4] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+				output[outputOffset + 3] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)]);
 
 				inputOffset += 5;
 				outputOffset += 8;
@@ -715,7 +674,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 5;
 			const ulong ENCODING_MASK = 31;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -735,25 +694,14 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 4] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)] << (8 * 4)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)] << (8 * 5)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)] << (8 * 6)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)] << (8 * 7)) ;
-
-				// flush output
-					output[outputOffset + 0] = (char)((outputBlock >> (8 * 7)) & 255);
-					output[outputOffset + 1] = (char)((outputBlock >> (8 * 6)) & 255);
-					output[outputOffset + 2] = (char)((outputBlock >> (8 * 5)) & 255);
-					output[outputOffset + 3] = (char)((outputBlock >> (8 * 4)) & 255);
-					output[outputOffset + 4] = (char)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 5] = (char)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 6] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 7] = (char)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 7] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 6] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 5] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 4] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+				output[outputOffset + 3] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 4) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 5) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 6) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 7) & ENCODING_MASK)]);
 
 				inputOffset += 5;
 				outputOffset += 8;
@@ -772,7 +720,7 @@ namespace deniszykov.BaseN
 		}
 #endif
 #if NETCOREAPP
-		private void EncodeBase64(ReadOnlySpan<byte> input, Span<byte> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
+		private unsafe void EncodeBase64(ReadOnlySpan<byte> input, Span<byte> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
 		{
 			if (input.IsEmpty || output.IsEmpty)
 			{
@@ -787,38 +735,42 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 6;
 			const ulong ENCODING_MASK = 63;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
-			// #2: encoding whole blocks
-
-			var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
-
-			inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
-			outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
-
-			while (wholeBlocksToProcess-- > 0)
+			fixed (char* alphabetPtr = this.Alphabet.Alphabet)
+			fixed (byte* outputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(output))
+			fixed (byte* inputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(input))
 			{
-				// fill input
-				var inputBlock =
-					((ulong)input[0] << (8 * 2)) |
-					((ulong)input[1] << (8 * 1)) |
-					((ulong)input[2] << (8 * 0)) ;
+				var inputPtr = inputBytes;
+				var outputPtr = outputBytes;
 
-				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) ;
+				// #2: encoding whole blocks
 
-				// flush output
-					output[0] = (byte)((outputBlock >> (8 * 3)) & 255);
-					output[1] = (byte)((outputBlock >> (8 * 2)) & 255);
-					output[2] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[3] = (byte)((outputBlock >> (8 * 0)) & 255);
+				var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
 
-				input = input.Slice(3);
-				output = output.Slice(4);
+				inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
+				outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
+
+				while (wholeBlocksToProcess-- > 0)
+				{
+					// fill input
+					var inputBlock =
+						((ulong)inputPtr[0] << (8 * 2)) |
+						((ulong)inputPtr[1] << (8 * 1)) |
+						((ulong)inputPtr[2] << (8 * 0)) ;
+
+					// encode input
+					outputPtr[3] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+					outputPtr[2] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+					outputPtr[1] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+					outputPtr[0] = (byte)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+
+					inputPtr += 3;
+					outputPtr += 4;
+				}
+
+				input = input.Slice(inputUsed);
+				output = output.Slice(outputUsed);
 			}
 
 			// #3: encoding any final block (partial with padding)
@@ -830,7 +782,7 @@ namespace deniszykov.BaseN
 		}
 #endif
 #if NETCOREAPP
-		private void EncodeBase64(ReadOnlySpan<byte> input, Span<char> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
+		private unsafe void EncodeBase64(ReadOnlySpan<byte> input, Span<char> output, bool flush, out int inputUsed, out int outputUsed, out bool completed)
 		{
 			if (input.IsEmpty || output.IsEmpty)
 			{
@@ -845,38 +797,42 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 6;
 			const ulong ENCODING_MASK = 63;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
-			// #2: encoding whole blocks
-
-			var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
-
-			inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
-			outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
-
-			while (wholeBlocksToProcess-- > 0)
+			fixed (char* alphabetPtr = this.Alphabet.Alphabet)
+			fixed (char* outputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(output))
+			fixed (byte* inputBytes = &System.Runtime.InteropServices.MemoryMarshal.GetReference(input))
 			{
-				// fill input
-				var inputBlock =
-					((ulong)input[0] << (8 * 2)) |
-					((ulong)input[1] << (8 * 1)) |
-					((ulong)input[2] << (8 * 0)) ;
+				var inputPtr = inputBytes;
+				var outputPtr = outputBytes;
 
-				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) ;
+				// #2: encoding whole blocks
 
-				// flush output
-					output[0] = (char)((outputBlock >> (8 * 3)) & 255);
-					output[1] = (char)((outputBlock >> (8 * 2)) & 255);
-					output[2] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[3] = (char)((outputBlock >> (8 * 0)) & 255);
+				var wholeBlocksToProcess = Math.Min(input.Length / INPUT_BLOCK_SIZE, output.Length / OUTPUT_BLOCK_SIZE);
 
-				input = input.Slice(3);
-				output = output.Slice(4);
+				inputUsed = INPUT_BLOCK_SIZE * wholeBlocksToProcess;
+				outputUsed = OUTPUT_BLOCK_SIZE * wholeBlocksToProcess;
+
+				while (wholeBlocksToProcess-- > 0)
+				{
+					// fill input
+					var inputBlock =
+						((ulong)inputPtr[0] << (8 * 2)) |
+						((ulong)inputPtr[1] << (8 * 1)) |
+						((ulong)inputPtr[2] << (8 * 0)) ;
+
+					// encode input
+					outputPtr[3] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+					outputPtr[2] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+					outputPtr[1] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+					outputPtr[0] = (char)(alphabetPtr[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
+
+					inputPtr += 3;
+					outputPtr += 4;
+				}
+
+				input = input.Slice(inputUsed);
+				output = output.Slice(outputUsed);
 			}
 
 			// #3: encoding any final block (partial with padding)
@@ -904,7 +860,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 6;
 			const ulong ENCODING_MASK = 63;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -922,17 +878,10 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 2] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) ;
-
-				// flush output
-					output[outputOffset + 0] = (byte)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 1] = (byte)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 2] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 3] = (byte)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 3] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
 
 				inputOffset += 3;
 				outputOffset += 4;
@@ -966,7 +915,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 6;
 			const ulong ENCODING_MASK = 63;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -984,17 +933,10 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 2] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) ;
-
-				// flush output
-					output[outputOffset + 0] = (char)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 1] = (char)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 2] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 3] = (char)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 3] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
 
 				inputOffset += 3;
 				outputOffset += 4;
@@ -1028,7 +970,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 6;
 			const ulong ENCODING_MASK = 63;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -1046,17 +988,10 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 2] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) ;
-
-				// flush output
-					output[outputOffset + 0] = (byte)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 1] = (byte)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 2] = (byte)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 3] = (byte)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 3] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (byte)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
 
 				inputOffset += 3;
 				outputOffset += 4;
@@ -1090,7 +1025,7 @@ namespace deniszykov.BaseN
 			const int ENCODING_BITS = 6;
 			const ulong ENCODING_MASK = 63;
 
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 
 			// #2: encoding whole blocks
 
@@ -1108,17 +1043,10 @@ namespace deniszykov.BaseN
 					((ulong)input[inputOffset + 2] << (8 * 0)) ;
 
 				// encode input
-				var outputBlock =
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)] << (8 * 0)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)] << (8 * 1)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)] << (8 * 2)) |
-					((ulong)alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)] << (8 * 3)) ;
-
-				// flush output
-					output[outputOffset + 0] = (char)((outputBlock >> (8 * 3)) & 255);
-					output[outputOffset + 1] = (char)((outputBlock >> (8 * 2)) & 255);
-					output[outputOffset + 2] = (char)((outputBlock >> (8 * 1)) & 255);
-					output[outputOffset + 3] = (char)((outputBlock >> (8 * 0)) & 255);
+				output[outputOffset + 3] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 0) & ENCODING_MASK)]);
+				output[outputOffset + 2] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 1) & ENCODING_MASK)]);
+				output[outputOffset + 1] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 2) & ENCODING_MASK)]);
+				output[outputOffset + 0] = (char)(alphabetChars[(int)((inputBlock >> ENCODING_BITS * 3) & ENCODING_MASK)]);
 
 				inputOffset += 3;
 				outputOffset += 4;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using JetBrains.Annotations;
@@ -15,6 +16,12 @@ namespace deniszykov.BaseN
 	/// </summary>
 	public sealed partial class BaseNDecoder : Decoder, ICryptoTransform
 	{
+		private const int ALGORITHM_TYPE_BASE_16 = 0;
+		private const int ALGORITHM_TYPE_BASE_32 = 1;
+		private const int ALGORITHM_TYPE_BASE_64 = 2;
+		private const int ALGORITHM_TYPE_OTHER = 3;
+
+		private readonly int algorithmType;
 		[NotNull]
 		public BaseNAlphabet Alphabet { get; }
 
@@ -36,6 +43,12 @@ namespace deniszykov.BaseN
 			if (baseNAlphabet == null) throw new ArgumentNullException(nameof(baseNAlphabet));
 
 			this.Alphabet = baseNAlphabet;
+			this.algorithmType = this.Alphabet.Alphabet.Length switch {
+				16 => ALGORITHM_TYPE_BASE_16,
+				32 => ALGORITHM_TYPE_BASE_32,
+				64 => ALGORITHM_TYPE_BASE_64,
+				_ => ALGORITHM_TYPE_OTHER
+			};
 		}
 
 #if NETSTANDARD1_6
@@ -123,15 +136,15 @@ namespace deniszykov.BaseN
 			if (charIndex > chars.Length) throw new ArgumentOutOfRangeException(nameof(charIndex));
 
 #if NETCOREAPP
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -140,15 +153,15 @@ namespace deniszykov.BaseN
 			}
 			
 #else
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -168,15 +181,15 @@ namespace deniszykov.BaseN
 			if (charCount < 0) throw new ArgumentOutOfRangeException(nameof(charCount));
 
 #if NETCOREAPP
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -184,15 +197,15 @@ namespace deniszykov.BaseN
 					break;
 			}
 #else
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -218,15 +231,15 @@ namespace deniszykov.BaseN
 			if (charCount < 0) throw new ArgumentOutOfRangeException(nameof(charCount));
 
 #if NETCOREAPP
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -234,15 +247,15 @@ namespace deniszykov.BaseN
 					break;
 			}
 #else
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -264,15 +277,15 @@ namespace deniszykov.BaseN
 			if (charIndex > chars.Length) throw new ArgumentOutOfRangeException(nameof(charIndex));
 
 #if NETCOREAPP
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -281,15 +294,15 @@ namespace deniszykov.BaseN
 			}
 			
 #else
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -305,15 +318,15 @@ namespace deniszykov.BaseN
 		/// </summary>
 		public void Convert(ReadOnlySpan<byte> bytes, Span<byte> chars, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
 		{
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
@@ -324,15 +337,15 @@ namespace deniszykov.BaseN
 		/// <inheritdoc />
 		public override void Convert(ReadOnlySpan<byte> bytes, Span<char> chars, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
 		{
-			switch (this.Alphabet.Alphabet.Length)
+			switch (this.algorithmType)
 			{
-				case 16:
+				case ALGORITHM_TYPE_BASE_16:
 					this.EncodeBase16(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 32:
+				case ALGORITHM_TYPE_BASE_32:
 					this.EncodeBase32(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
 					break;
-				case 64:
+				case ALGORITHM_TYPE_BASE_64:
 					this.EncodeBase64(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 				default:
