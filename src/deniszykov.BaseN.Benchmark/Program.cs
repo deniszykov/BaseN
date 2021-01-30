@@ -10,6 +10,8 @@ namespace deniszykov.BaseN.Benchmark
 			var summary = BenchmarkRunner.Run<Base32EncodeBenchmarks>();
 			Console.WriteLine(summary.ToString());
 			Console.ReadKey();
+
+			//new Base32EncodeBenchmarks().BaseN_BaseNDecoder_Convert();
 		}
 	}
 }

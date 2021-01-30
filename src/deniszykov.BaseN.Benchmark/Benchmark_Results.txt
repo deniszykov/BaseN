@@ -2,11 +2,11 @@
 
 |                                 Method |      Mean |    Error |   StdDev | Ratio | RatioSD |    Gen 0 |    Gen 1 |    Gen 2 | Allocated |
 |--------------------------------------- |----------:|---------:|---------:|------:|--------:|---------:|---------:|---------:|----------:|
-|          System_Convert_ToBase64String |  42.91 ms | 0.390 ms | 0.365 ms |  1.00 |    0.00 | 250.0000 | 250.0000 | 250.0000 |  53.33 MB |
-|           System_Memory_Base64ToString |  13.77 ms | 0.214 ms | 0.200 ms |  0.32 |    0.00 |  93.7500 |  93.7500 |  93.7500 |  26.67 MB |
-|             BaseN_BaseNDecoder_Convert | 109.93 ms | 0.707 ms | 0.661 ms |  2.56 |    0.03 |        - |        - |        - |  26.67 MB |
-|           BaseN_Base64Convert_ToString | 150.71 ms | 1.264 ms | 1.182 ms |  3.51 |    0.04 | 500.0000 | 500.0000 | 500.0000 | 106.67 MB |
-|           BaseN_Base32Convert_ToString | 190.40 ms | 2.061 ms | 1.928 ms |  4.44 |    0.06 | 333.3333 | 333.3333 | 333.3333 |    128 MB |
-| Wiry_Base32Encoding_Standard_GetString |  93.62 ms | 1.815 ms | 2.772 ms |  2.18 |    0.08 | 500.0000 | 500.0000 | 500.0000 |    128 MB |
-|       SimpleBase_Base32_Rfc4648_Encode |  96.40 ms | 0.935 ms | 0.829 ms |  2.25 |    0.03 | 166.6667 | 166.6667 | 166.6667 |     64 MB |
-|                  Albireo_Base32_Encode | 145.21 ms | 2.792 ms | 2.988 ms |  3.38 |    0.07 | 500.0000 | 500.0000 | 500.0000 |    128 MB |
+|          System_Convert_ToBase64String |  48.80 ms | 0.954 ms | 0.892 ms |  1.00 |    0.00 | 181.8182 | 181.8182 | 181.8182 |  53.33 MB |
+|           System_Memory_Base64ToString |  15.29 ms | 0.303 ms | 0.666 ms |  0.31 |    0.01 | 125.0000 | 125.0000 | 125.0000 |  26.67 MB |
+|             BaseN_BaseNDecoder_Convert |  49.13 ms | 0.959 ms | 1.213 ms |  1.01 |    0.03 |  90.9091 |  90.9091 |  90.9091 |  26.67 MB |
+|           BaseN_Base64Convert_ToString |  59.41 ms | 1.177 ms | 1.209 ms |  1.22 |    0.03 | 222.2222 | 222.2222 | 222.2222 |  53.33 MB |
+|           BaseN_Base32Convert_ToString |  70.00 ms | 1.346 ms | 1.797 ms |  1.44 |    0.03 | 250.0000 | 250.0000 | 250.0000 |     64 MB |
+| Wiry_Base32Encoding_Standard_GetString | 100.28 ms | 1.963 ms | 2.687 ms |  2.05 |    0.07 | 600.0000 | 600.0000 | 600.0000 |    128 MB |
+|       SimpleBase_Base32_Rfc4648_Encode | 102.78 ms | 1.931 ms | 2.644 ms |  2.13 |    0.07 | 166.6667 | 166.6667 | 166.6667 |     64 MB |
+|                  Albireo_Base32_Encode | 152.63 ms | 2.792 ms | 2.742 ms |  3.13 |    0.08 | 500.0000 | 500.0000 | 500.0000 |    128 MB |
