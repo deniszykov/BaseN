@@ -13,7 +13,7 @@ namespace deniszykov.BaseN
 	/// Base-(Alphabet Length) binary data encoder (!) based on specified <see cref="Alphabet"/>.
 	/// Class named "Decoder" because it is based on <see cref="Decoder"/>, but it is effectively encoder.
 	/// </summary>
-	public sealed class BaseNDecoder : Decoder, ICryptoTransform
+	public sealed partial class BaseNDecoder : Decoder, ICryptoTransform
 	{
 		[NotNull]
 		public BaseNAlphabet Alphabet { get; }
@@ -123,9 +123,38 @@ namespace deniszykov.BaseN
 			if (charIndex > chars.Length) throw new ArgumentOutOfRangeException(nameof(charIndex));
 
 #if NETCOREAPP
-			this.EncodeInternal<byte, byte>(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(new ReadOnlySpan<byte>(bytes, byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
+			
 #else
-			this.EncodeInternal(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
 #endif
 		}
 		/// <summary>
@@ -139,9 +168,38 @@ namespace deniszykov.BaseN
 			if (charCount < 0) throw new ArgumentOutOfRangeException(nameof(charCount));
 
 #if NETCOREAPP
-			this.EncodeInternal(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(new ReadOnlySpan<byte>(bytes, byteCount), new Span<byte>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
 #else
-			this.EncodeInternal((ByteSafePtr)bytes, 0, byteCount, (ByteSafePtr)chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny((ByteSafePtr)bytes, 0, byteCount, (ByteSafePtr)chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
+			
 #endif
 		}
 #if NETSTANDARD1_6
@@ -160,9 +218,38 @@ namespace deniszykov.BaseN
 			if (charCount < 0) throw new ArgumentOutOfRangeException(nameof(charCount));
 
 #if NETCOREAPP
-			this.EncodeInternal(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(new ReadOnlySpan<byte>(bytes, byteCount), new Span<char>(chars, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
 #else
-			this.EncodeInternal((ByteSafePtr)bytes, 0, byteCount, (CharSafePtr)chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes, 0, byteCount, chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny((ByteSafePtr)bytes, 0, byteCount, (CharSafePtr)chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
+			
 #endif
 		}
 		/// <inheritdoc />
@@ -177,9 +264,38 @@ namespace deniszykov.BaseN
 			if (charIndex > chars.Length) throw new ArgumentOutOfRangeException(nameof(charIndex));
 
 #if NETCOREAPP
-			this.EncodeInternal<byte, char>(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes.AsSpan(byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(new ReadOnlySpan<byte>(bytes, byteIndex, byteCount), chars.AsSpan(charIndex, charCount), flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
+			
 #else
-			this.EncodeInternal(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(bytes, byteIndex, byteCount, chars, charIndex, charCount, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
 #endif
 		}
 
@@ -189,12 +305,40 @@ namespace deniszykov.BaseN
 		/// </summary>
 		public void Convert(ReadOnlySpan<byte> bytes, Span<byte> chars, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
 		{
-			this.EncodeInternal(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
 		}
 		/// <inheritdoc />
 		public override void Convert(ReadOnlySpan<byte> bytes, Span<char> chars, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
 		{
-			this.EncodeInternal(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+			switch (this.Alphabet.Alphabet.Length)
+			{
+				case 16:
+					this.EncodeBase16(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 32:
+					this.EncodeBase32(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				case 64:
+					this.EncodeBase64(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+				default:
+					this.EncodeAny(bytes, chars, flush, out bytesUsed, out charsUsed, out completed);
+					break;
+			}
 		}
 		/// <inheritdoc />
 		public override int GetCharCount(ReadOnlySpan<byte> bytes, bool flush)
@@ -210,7 +354,7 @@ namespace deniszykov.BaseN
 #endif
 
 #if NETCOREAPP
-		private void EncodeInternal<InputT, OutputT>(ReadOnlySpan<InputT> input, Span<OutputT> output, bool flush, out int inputUsed, out int outputUsed, out bool completed) where InputT : unmanaged where OutputT : unmanaged
+		private void EncodeAny<InputT, OutputT>(ReadOnlySpan<InputT> input, Span<OutputT> output, bool flush, out int inputUsed, out int outputUsed, out bool completed) where InputT : unmanaged where OutputT : unmanaged
 		{
 			if (input.IsEmpty || output.IsEmpty)
 			{
@@ -218,8 +362,9 @@ namespace deniszykov.BaseN
 				completed = true;
 				return;
 			}
+			
 #else
-		private unsafe void EncodeInternal<InputT, OutputT>(InputT input, int inputOffset, int inputCount, OutputT output, int outputOffset, int outputCount, bool flush, out int inputUsed, out int outputUsed, out bool completed)
+		private unsafe void EncodeAny<InputT, OutputT>(InputT input, int inputOffset, int inputCount, OutputT output, int outputOffset, int outputCount, bool flush, out int inputUsed, out int outputUsed, out bool completed)
 		{
 			if (inputCount == 0 || outputCount == 0)
 			{
@@ -231,7 +376,7 @@ namespace deniszykov.BaseN
 
 			// #1: preparing
 			var i = 0;
-			var alphabetChars = this.Alphabet.Alphabet;
+			var alphabetChars = this.Alphabet.Alphabet ?? throw new InvalidOperationException();
 			var inputBlockSize = this.Alphabet.EncodingBlockSize;
 			var outputBlockSize = this.Alphabet.DecodingBlockSize;
 			var encodingMask = (ulong)alphabetChars.Length - 1;
@@ -257,11 +402,11 @@ namespace deniszykov.BaseN
 
 			if (typeof(OutputT) == typeof(byte[]))
 			{
-				outputBytes = (byte[])(object)output;
+				outputBytes = (byte[])(object)output ?? throw new InvalidOperationException();
 			}
 			else if (typeof(OutputT) == typeof(char[]))
 			{
-				outputChars = (char[])(object)output;
+				outputChars = (char[])(object)output ?? throw new InvalidOperationException();
 			}
 			else if (typeof(OutputT) == typeof(ByteSafePtr))
 			{
@@ -278,11 +423,11 @@ namespace deniszykov.BaseN
 
 			if (typeof(InputT) == typeof(byte[]))
 			{
-				inputBytes = (byte[])(object)input;
+				inputBytes = (byte[])(object)input?? throw new InvalidOperationException();
 			}
 			else if (typeof(InputT) == typeof(char[]))
 			{
-				inputChars = (char[])(object)input;
+				inputChars = (char[])(object)input?? throw new InvalidOperationException();
 			}
 			else if (typeof(InputT) == typeof(ByteSafePtr))
 			{
@@ -364,6 +509,7 @@ namespace deniszykov.BaseN
 					outputBlock |= alphabetChars[(int)(inputBlock & encodingMask)];
 					inputBlock >>= encodingBits;
 				}
+
 				// flush output
 #if NETCOREAPP
 				if (typeof(OutputT) == typeof(byte))
