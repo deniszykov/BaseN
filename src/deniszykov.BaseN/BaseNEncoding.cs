@@ -116,7 +116,7 @@ namespace deniszykov.BaseN
 		}
 #endif
 		/// <inheritdoc />
-		public override int GetCharCount([NotNull]byte[] bytes, int index, int count)
+		public override int GetCharCount(byte[] bytes, int index, int count)
 		{
 			return this.decoder.GetCharCount(bytes, index, count);
 		}
@@ -126,7 +126,7 @@ namespace deniszykov.BaseN
 			return this.decoder.GetCharCount(bytes, count, flush: true);
 		}
 		/// <inheritdoc />
-		public override int GetChars([NotNull] byte[] bytes, int byteIndex, int byteCount, [NotNull] char[] chars, int charIndex)
+		public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex)
 		{
 			return this.decoder.GetChars(bytes, byteIndex, byteCount, chars, charIndex, flush: true);
 		}
@@ -134,6 +134,28 @@ namespace deniszykov.BaseN
 		public override unsafe int GetChars(byte* bytes, int byteCount, char* chars, int charCount)
 		{
 			return this.decoder.GetChars(bytes, byteCount, chars, charCount, flush: true);
+		}
+		/// <inheritdoc />
+		public override unsafe string GetString(byte[] bytes, int index, int count)
+		{
+			var charCount = this.decoder.GetCharCount(bytes, index, count);
+			if (charCount == 0)
+			{
+				return string.Empty;
+			}
+			var output = new string('\0', charCount);
+			fixed (char* outputPtr = output)
+			{
+#if NETCOREAPP
+				this.decoder.Convert(new ReadOnlySpan<byte>(bytes, index, count), new Span<char>(outputPtr, output.Length), flush: true, out _, out _, out _);
+#else
+				fixed (byte* inputPtr = bytes)
+				{
+					this.decoder.Convert(inputPtr + index, count, outputPtr, output.Length, flush: true, out _, out _, out _);
+				}
+#endif
+			}
+			return output;
 		}
 		/// <inheritdoc />
 		public override int GetMaxByteCount(int charCount)
@@ -146,13 +168,11 @@ namespace deniszykov.BaseN
 			return this.decoder.GetMaxCharCount(byteCount);
 		}
 		/// <inheritdoc />
-		[NotNull]
 		public override Decoder GetDecoder()
 		{
 			return this.decoder;
 		}
 		/// <inheritdoc />
-		[NotNull]
 		public override Encoder GetEncoder()
 		{
 			return this.encoder;
