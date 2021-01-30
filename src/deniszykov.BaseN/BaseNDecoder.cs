@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using JetBrains.Annotations;
 
@@ -12,10 +13,19 @@ namespace deniszykov.BaseN
 	/// Base-(Alphabet Length) binary data encoder (!) based on specified <see cref="Alphabet"/>.
 	/// Class named "Decoder" because it is based on <see cref="Decoder"/>, but it is effectively encoder.
 	/// </summary>
-	public sealed class BaseNDecoder : Decoder
+	public sealed class BaseNDecoder : Decoder, ICryptoTransform
 	{
 		[NotNull]
 		public BaseNAlphabet Alphabet { get; }
+
+		/// <inheritdoc />
+		int ICryptoTransform.InputBlockSize => this.Alphabet.EncodingBlockSize;
+		/// <inheritdoc />
+		int ICryptoTransform.OutputBlockSize => this.Alphabet.DecodingBlockSize;
+		/// <inheritdoc />
+		bool ICryptoTransform.CanTransformMultipleBlocks => true;
+		/// <inheritdoc />
+		bool ICryptoTransform.CanReuseTransform => true;
 
 		/// <summary>
 		/// Constructor of <see cref="BaseNDecoder"/>.
@@ -83,6 +93,20 @@ namespace deniszykov.BaseN
 		{
 			this.Convert(bytes, byteCount, chars, charCount, flush, out _, out var charsUsed, out _);
 			return charsUsed;
+		}
+
+		/// <inheritdoc />
+		int ICryptoTransform.TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+		{
+			this.Convert(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset, outputBuffer.Length - outputOffset, flush: true, out _, out var outputUsed, out _);
+			return outputUsed;
+		}
+		/// <inheritdoc />
+		byte[] ICryptoTransform.TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+		{
+			var outputBuffer = new byte[this.GetCharCount(inputBuffer, inputOffset, inputCount, flush: true)];
+			this.Convert(inputBuffer, inputOffset, inputCount, outputBuffer, 0, outputBuffer.Length, flush: true, out _, out _, out _);
+			return outputBuffer;
 		}
 
 		/// <summary>
@@ -578,6 +602,12 @@ namespace deniszykov.BaseN
 				finalBlockSize = 0;
 			}
 			return checked(wholeBlocksSize + finalBlockSize);
+		}
+
+		/// <inheritdoc />
+		void IDisposable.Dispose()
+		{
+			this.Reset();
 		}
 
 		/// <inheritdoc />

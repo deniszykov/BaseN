@@ -10,7 +10,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace deniszykov.BaseN.Tests
@@ -305,6 +307,53 @@ namespace deniszykov.BaseN.Tests
 			Assert.Equal(input.Count, inputUsed);
 			Assert.Equal(output.Count, outputUsed);
 			Assert.Equal(plainTextData, outputBuffer);
+		}
+
+		[Theory]
+		[MemberData(nameof(Base32TestData))]
+		[MemberData(nameof(Base64TestData))]
+		[MemberData(nameof(Base64UrlTestData))]
+		[MemberData(nameof(Base16UpperTestData))]
+		[MemberData(nameof(Base16LowerTestData))]
+		[MemberData(nameof(ZBase32TestData))]
+		[MemberData(nameof(DifferentSizeTestData))]
+		public void DecodeStreamTest(BaseNEncoding encoding, byte[] plainTextData, string encodedData)
+		{
+			var inputBytes = Encoding.ASCII.GetBytes(encodedData.ToCharArray(), 0, encodedData.Length);
+
+			var outputStream = new MemoryStream();
+
+			using (var inputStream = new MemoryStream(inputBytes))
+			using (var decodeStream = inputStream.BaseNDecode(encoding))
+			{
+				decodeStream.CopyTo(outputStream);
+			}
+
+			var outputBytes = outputStream.ToArray();
+
+			Assert.Equal(plainTextData, outputBytes);
+		}
+
+		[Theory]
+		[MemberData(nameof(Base32TestData))]
+		[MemberData(nameof(Base64TestData))]
+		[MemberData(nameof(Base64UrlTestData))]
+		[MemberData(nameof(Base16UpperTestData))]
+		[MemberData(nameof(Base16LowerTestData))]
+		[MemberData(nameof(ZBase32TestData))]
+		[MemberData(nameof(DifferentSizeTestData))]
+		public void EncodeStreamTest(BaseNEncoding encoding, byte[] plainTextData, string encodedData)
+		{
+			var output = new MemoryStream();
+			using (var encodingStream = output.BaseNEncode(encoding))
+			{
+				encodingStream.Write(plainTextData, 0, plainTextData.Length);
+				encodingStream.Close(); // will flush remaining data to output stream
+			}
+
+			var outputBytes = output.ToArray();
+
+			Assert.Equal(encodedData, Encoding.ASCII.GetString(outputBytes));
 		}
 
 #if NETCOREAPP

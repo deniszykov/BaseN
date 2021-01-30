@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Text;
 using JetBrains.Annotations;
 
@@ -11,10 +12,19 @@ namespace deniszykov.BaseN
 	/// Base-(Alphabet Length) binary data decoder (!) based on specified <see cref="Alphabet"/>.
 	/// Class named "Encoder" because it is based on <see cref="Encoder"/>, but it is effectively decoder.
 	/// </summary>
-	public sealed class BaseNEncoder : Encoder
+	public sealed class BaseNEncoder : Encoder, ICryptoTransform
 	{
 		[NotNull]
 		public BaseNAlphabet Alphabet { get; }
+
+		/// <inheritdoc />
+		int ICryptoTransform.InputBlockSize => this.Alphabet.DecodingBlockSize;
+		/// <inheritdoc />
+		int ICryptoTransform.OutputBlockSize => this.Alphabet.EncodingBlockSize;
+		/// <inheritdoc />
+		bool ICryptoTransform.CanTransformMultipleBlocks => true;
+		/// <inheritdoc />
+		bool ICryptoTransform.CanReuseTransform => true;
 
 		/// <summary>
 		/// Constructor fo <see cref="BaseNEncoder"/>.
@@ -188,6 +198,20 @@ namespace deniszykov.BaseN
 		{
 			this.Convert(chars, charCount, bytes, byteCount, flush, out _, out var bytesUsed, out _);
 			return bytesUsed;
+		}
+
+		/// <inheritdoc />
+		int ICryptoTransform.TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+		{
+			this.Convert(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset, outputBuffer.Length - outputOffset, flush: true, out _, out var outputUsed, out _);
+			return outputUsed;
+		}
+		/// <inheritdoc />
+		byte[] ICryptoTransform.TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
+		{
+			var outputBuffer = new byte[this.GetByteCount(inputBuffer, inputOffset, inputCount, flush: true)];
+			this.Convert(inputBuffer, inputOffset, inputCount, outputBuffer, 0, outputBuffer.Length, flush: true, out _, out _, out _);
+			return outputBuffer;
 		}
 
 		/// <summary>
@@ -539,6 +563,12 @@ namespace deniszykov.BaseN
 			}
 
 			completed = inputCount == 0;
+		}
+
+		/// <inheritdoc />
+		void IDisposable.Dispose()
+		{
+			this.Reset();
 		}
 
 		/// <inheritdoc />
