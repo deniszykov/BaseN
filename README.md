@@ -73,11 +73,11 @@ var encoding = new BaseNEncoding(binHex4Alphabet, "mac-binhex40");
 ```
 |                                 Method |      Mean | Ratio |    Gen 0 | Allocated |
 |--------------------------------------- |----------:|------:|---------:|----------:|
-|          System_Convert_ToBase64String |  49.21 ms |  1.00 | 181.8182 |  53.33 MB |
 |           System_Memory_Base64ToString |  15.57 ms |  0.32 | 125.0000 |  26.67 MB |
 |             BaseN_BaseNDecoder_Convert |  29.00 ms |  0.59 | 125.0000 |  26.67 MB |
 |           BaseN_Base64Convert_ToString |  39.60 ms |  0.80 | 230.7692 |  53.33 MB |
 |           BaseN_Base32Convert_ToString |  46.40 ms |  0.94 | 181.8182 |     64 MB |
+|          System_Convert_ToBase64String |  49.21 ms |  1.00 | 181.8182 |  53.33 MB |
 | Wiry_Base32Encoding_Standard_GetString |  96.24 ms |  1.96 | 500.0000 |    128 MB |
 |       SimpleBase_Base32_Rfc4648_Encode |  99.23 ms |  2.02 | 166.6667 |     64 MB |
 |                  Albireo_Base32_Encode | 150.08 ms |  3.04 | 500.0000 |    128 MB |
