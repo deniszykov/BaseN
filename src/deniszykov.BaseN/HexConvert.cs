@@ -29,8 +29,7 @@ namespace deniszykov.BaseN
 		/// <param name="bytes">Byte array to encode.</param>
 		/// <param name="lowerCase">Use lower case characters for encoding.</param>
 		/// <returns>Base16-encoded string.</returns>
-		[NotNull]
-		public static string ToString([NotNull] byte[] bytes, bool lowerCase = false)
+		public static string ToString(byte[] bytes, bool lowerCase = false)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
@@ -44,8 +43,7 @@ namespace deniszykov.BaseN
 		/// <param name="count">Number of bytes to encode in <paramref name="bytes"/>.</param>
 		/// <param name="lowerCase">Use lower case characters for encoding.</param>
 		/// <returns>Base16-encoded string.</returns>
-		[NotNull]
-		public static string ToString([NotNull] byte[] bytes, int offset, int count, bool lowerCase = false)
+		public static string ToString(byte[] bytes, int offset, int count, bool lowerCase = false)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -62,8 +60,7 @@ namespace deniszykov.BaseN
 		/// <param name="bytes">Byte array to encode.</param>
 		/// <param name="lowerCase">Use lower case characters for encoding.</param>
 		/// <returns>Base16-encoded char array.</returns>
-		[NotNull]
-		public static char[] ToCharArray([NotNull] byte[] bytes, bool lowerCase = false)
+		public static char[] ToCharArray(byte[] bytes, bool lowerCase = false)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
@@ -77,8 +74,7 @@ namespace deniszykov.BaseN
 		/// <param name="count">Number of bytes to encode in <paramref name="bytes"/>.</param>
 		/// <param name="lowerCase">Use lower case characters for encoding.</param>
 		/// <returns>Base16-encoded char array.</returns>
-		[NotNull]
-		public static char[] ToCharArray([NotNull] byte[] bytes, int offset, int count, bool lowerCase = false)
+		public static char[] ToCharArray(byte[] bytes, int offset, int count, bool lowerCase = false)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -95,8 +91,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="base16Chars">Char array contains Base16 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] char[] base16Chars)
+		public static byte[] ToBytes(char[] base16Chars)
 		{
 			if (base16Chars == null) throw new ArgumentNullException(nameof(base16Chars));
 
@@ -109,8 +104,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="base16Chars"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="base16Chars"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] char[] base16Chars, int offset, int count)
+		public static byte[] ToBytes(char[] base16Chars, int offset, int count)
 		{
 			if (base16Chars == null) throw new ArgumentNullException(nameof(base16Chars));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -135,8 +129,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="base16String">Base16 string contains Base16 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] string base16String)
+		public static byte[] ToBytes(string base16String)
 		{
 			if (base16String == null) throw new ArgumentNullException(nameof(base16String));
 
@@ -149,8 +142,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="base16String"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="base16String"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] string base16String, int offset, int count)
+		public static byte[] ToBytes(string base16String, int offset, int count)
 		{
 			if (base16String == null) throw new ArgumentNullException(nameof(base16String));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -175,8 +167,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="base16Chars">Char array contains Base16 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] byte[] base16Chars)
+		public static byte[] ToBytes(byte[] base16Chars)
 		{
 			if (base16Chars == null) throw new ArgumentNullException(nameof(base16Chars));
 
@@ -189,8 +180,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="base16Chars"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="base16Chars"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] byte[] base16Chars, int offset, int count)
+		public static byte[] ToBytes(byte[] base16Chars, int offset, int count)
 		{
 			if (base16Chars == null) throw new ArgumentNullException(nameof(base16Chars));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));

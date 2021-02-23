@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
-using JetBrains.Annotations;
 
 namespace deniszykov.BaseN
 {
@@ -22,7 +20,6 @@ namespace deniszykov.BaseN
 		private const int ALGORITHM_TYPE_OTHER = 3;
 
 		private readonly int algorithmType;
-		[NotNull]
 		public BaseNAlphabet Alphabet { get; }
 
 		/// <inheritdoc />
@@ -38,12 +35,13 @@ namespace deniszykov.BaseN
 		/// Constructor of <see cref="BaseNDecoder"/>.
 		/// </summary>
 		/// <param name="baseNAlphabet"></param>
-		public BaseNDecoder([NotNull] BaseNAlphabet baseNAlphabet)
+		public BaseNDecoder(BaseNAlphabet baseNAlphabet)
 		{
 			if (baseNAlphabet == null) throw new ArgumentNullException(nameof(baseNAlphabet));
 
 			this.Alphabet = baseNAlphabet;
-			this.algorithmType = this.Alphabet.Alphabet.Length switch {
+			this.algorithmType = this.Alphabet.Alphabet.Length switch
+			{
 				16 => ALGORITHM_TYPE_BASE_16,
 				32 => ALGORITHM_TYPE_BASE_32,
 				64 => ALGORITHM_TYPE_BASE_64,
@@ -125,7 +123,7 @@ namespace deniszykov.BaseN
 		/// <summary>
 		/// See description on similar conversion methods. This is just overload with different buffer types.
 		/// </summary>
-		public void Convert([NotNull] byte[] bytes, int byteIndex, int byteCount, [NotNull] byte[] chars, int charIndex, int charCount, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
+		public void Convert(byte[] bytes, int byteIndex, int byteCount, byte[] chars, int charIndex, int charCount, bool flush, out int bytesUsed, out int charsUsed, out bool completed)
 		{
 			if (bytes == null) throw new NullReferenceException(nameof(bytes));
 			if (byteIndex < 0) throw new ArgumentOutOfRangeException(nameof(byteIndex));
@@ -212,7 +210,7 @@ namespace deniszykov.BaseN
 					this.EncodeAny((ByteSafePtr)bytes, 0, byteCount, (ByteSafePtr)chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 			}
-			
+
 #endif
 		}
 #if NETSTANDARD1_6
@@ -262,7 +260,7 @@ namespace deniszykov.BaseN
 					this.EncodeAny((ByteSafePtr)bytes, 0, byteCount, (CharSafePtr)chars, 0, charCount, flush, out bytesUsed, out charsUsed, out completed);
 					break;
 			}
-			
+
 #endif
 		}
 		/// <inheritdoc />
@@ -415,19 +413,19 @@ namespace deniszykov.BaseN
 
 			if (typeof(OutputT) == typeof(byte[]))
 			{
-				outputBytes = (byte[])(object)output ?? throw new InvalidOperationException();
+				outputBytes = (byte[])(object)output! ?? throw new InvalidOperationException();
 			}
 			else if (typeof(OutputT) == typeof(char[]))
 			{
-				outputChars = (char[])(object)output ?? throw new InvalidOperationException();
+				outputChars = (char[])(object)output! ?? throw new InvalidOperationException();
 			}
 			else if (typeof(OutputT) == typeof(ByteSafePtr))
 			{
-				outputBytePtr = (byte*)(ByteSafePtr)(object)output;
+				outputBytePtr = (byte*)(ByteSafePtr)(object)output!;
 			}
 			else if (typeof(OutputT) == typeof(CharSafePtr))
 			{
-				outputCharPtr = (char*)(CharSafePtr)(object)output;
+				outputCharPtr = (char*)(CharSafePtr)(object)output!;
 			}
 			else
 			{
@@ -436,19 +434,19 @@ namespace deniszykov.BaseN
 
 			if (typeof(InputT) == typeof(byte[]))
 			{
-				inputBytes = (byte[])(object)input?? throw new InvalidOperationException();
+				inputBytes = (byte[])(object)input! ?? throw new InvalidOperationException();
 			}
 			else if (typeof(InputT) == typeof(char[]))
 			{
-				inputChars = (char[])(object)input?? throw new InvalidOperationException();
+				inputChars = (char[])(object)input! ?? throw new InvalidOperationException();
 			}
 			else if (typeof(InputT) == typeof(ByteSafePtr))
 			{
-				inputBytePtr = (byte*)(ByteSafePtr)(object)input;
+				inputBytePtr = (byte*)(ByteSafePtr)(object)input!;
 			}
 			else if (typeof(InputT) == typeof(CharSafePtr))
 			{
-				inputCharPtr = (char*)(CharSafePtr)(object)input;
+				inputCharPtr = (char*)(CharSafePtr)(object)input!;
 			}
 			else
 			{
@@ -486,7 +484,7 @@ namespace deniszykov.BaseN
 					for (i = 0; i < inputBlockSize; i++)
 					{
 						inputBlock <<= 8;
-						inputBlock |= inputBytes[inputOffset++];
+						inputBlock |= inputBytes![inputOffset++];
 					}
 				}
 				if (typeof(InputT) == typeof(char[]))
@@ -494,7 +492,7 @@ namespace deniszykov.BaseN
 					for (i = 0; i < inputBlockSize; i++)
 					{
 						inputBlock <<= 8;
-						inputBlock |= inputChars[inputOffset++];
+						inputBlock |= inputChars![inputOffset++];
 					}
 				}
 				if (typeof(InputT) == typeof(ByteSafePtr))
@@ -548,7 +546,7 @@ namespace deniszykov.BaseN
 
 					for (i = 0; i < outputBlockSize; i++)
 					{
-						outputBytes[outputOffset++] = (byte)(outputBlock & 0xFF);
+						outputBytes![outputOffset++] = (byte)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}
@@ -558,7 +556,7 @@ namespace deniszykov.BaseN
 
 					for (i = 0; i < outputBlockSize; i++)
 					{
-						outputChars[outputOffset++] = (char)(outputBlock & 0xFF);
+						outputChars![outputOffset++] = (char)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}
@@ -618,7 +616,7 @@ namespace deniszykov.BaseN
 				for (i = 0; i < inputBlockSize && i < inputCount; i++)
 				{
 					inputBlock <<= 8;
-					inputBlock |= inputBytes[inputOffset++];
+					inputBlock |= inputBytes![inputOffset++];
 				}
 			}
 			if (typeof(InputT) == typeof(char[]))
@@ -626,7 +624,7 @@ namespace deniszykov.BaseN
 				for (i = 0; i < inputBlockSize && i < inputCount; i++)
 				{
 					inputBlock <<= 8;
-					inputBlock |= inputChars[inputOffset++];
+					inputBlock |= inputChars![inputOffset++];
 				}
 			}
 			if (typeof(InputT) == typeof(ByteSafePtr))
@@ -704,7 +702,7 @@ namespace deniszykov.BaseN
 
 				for (i = 0; i < finalOutputBlockSize; i++)
 				{
-					outputBytes[outputOffset++] = (byte)(outputBlock & 0xFF);
+					outputBytes![outputOffset++] = (byte)(outputBlock & 0xFF);
 					outputBlock >>= 8;
 				}
 			}
@@ -714,7 +712,7 @@ namespace deniszykov.BaseN
 
 				for (i = 0; i < finalOutputBlockSize; i++)
 				{
-					outputChars[outputOffset++] = (char)(outputBlock & 0xFF);
+					outputChars![outputOffset++] = (char)(outputBlock & 0xFF);
 					outputBlock >>= 8;
 				}
 			}

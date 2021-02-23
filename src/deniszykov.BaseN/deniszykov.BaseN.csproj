@@ -7,6 +7,12 @@
 		<PackageTags>base64, Base64url, Base32, ZBase32, Base16, hex, converter, streaming converter, encoding</PackageTags>
 	</PropertyGroup>
 	<ItemGroup>
+	  <PackageReference Include="ResharperCodeContractNullability" Version="2.0.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+	<ItemGroup>
 	  <None Update="BaseNDecoder.Encode.tt">
 	    <LastGenOutput>BaseNDecoder.Encode.cs</LastGenOutput>
 	    <Generator>TextTemplatingFileGenerator</Generator>

@@ -9,10 +9,14 @@
 
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
-		<PackageReference Include = "Albireo.Base32" Version="1.2.0" />
-		<PackageReference Include = "BenchmarkDotNet" Version="0.12.1" />
-		<PackageReference Include = "SimpleBase" Version="3.0.2" />
-		<PackageReference Include = "Wiry.Base32" Version="1.1.1" />
+		<PackageReference Include="Albireo.Base32" Version="1.2.0" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+		<PackageReference Include="ResharperCodeContractNullability" Version="2.0.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SimpleBase" Version="3.0.2" />
+		<PackageReference Include="Wiry.Base32" Version="1.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

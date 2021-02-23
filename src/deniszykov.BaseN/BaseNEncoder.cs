@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
-using JetBrains.Annotations;
 
 namespace deniszykov.BaseN
 {
@@ -14,7 +13,6 @@ namespace deniszykov.BaseN
 	/// </summary>
 	public sealed class BaseNEncoder : Encoder, ICryptoTransform
 	{
-		[NotNull]
 		public BaseNAlphabet Alphabet { get; }
 
 		/// <inheritdoc />
@@ -30,7 +28,7 @@ namespace deniszykov.BaseN
 		/// Constructor fo <see cref="BaseNEncoder"/>.
 		/// </summary>
 		/// <param name="baseNAlphabet"></param>
-		public BaseNEncoder([NotNull] BaseNAlphabet baseNAlphabet)
+		public BaseNEncoder(BaseNAlphabet baseNAlphabet)
 		{
 			if (baseNAlphabet == null) throw new ArgumentNullException(nameof(baseNAlphabet));
 
@@ -107,7 +105,7 @@ namespace deniszykov.BaseN
 		/// <summary>
 		/// See other conversion methods for info.
 		/// </summary>
-		public int GetByteCount([NotNull] string chars, int index, int count, bool flush)
+		public int GetByteCount(string chars, int index, int count, bool flush)
 		{
 			if (chars == null) throw new NullReferenceException(nameof(chars));
 			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
@@ -139,7 +137,7 @@ namespace deniszykov.BaseN
 		/// <summary>
 		/// See other conversion methods for info.
 		/// </summary>
-		public int GetByteCount([NotNull] byte[] chars, int index, int count, bool flush)
+		public int GetByteCount(byte[] chars, int index, int count, bool flush)
 		{
 			if (chars == null) throw new NullReferenceException(nameof(chars));
 			if (count < 0) throw new ArgumentOutOfRangeException(nameof(count));
@@ -279,7 +277,7 @@ namespace deniszykov.BaseN
 		/// <summary>
 		/// See description on similar conversion methods. This is just overload with different buffer types.
 		/// </summary>
-		public void Convert([NotNull] byte[] chars, int charIndex, int charCount, [NotNull] byte[] bytes, int byteIndex, int byteCount, bool flush, out int charsUsed, out int bytesUsed, out bool completed)
+		public void Convert(byte[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex, int byteCount, bool flush, out int charsUsed, out int bytesUsed, out bool completed)
 		{
 			if (bytes == null) throw new NullReferenceException(nameof(bytes));
 			if (byteIndex < 0) throw new ArgumentOutOfRangeException(nameof(byteIndex));
@@ -299,7 +297,7 @@ namespace deniszykov.BaseN
 		/// <summary>
 		/// See description on similar conversion methods. This is just overload with different buffer types.
 		/// </summary>
-		public void Convert([NotNull] string chars, int charIndex, int charCount, [NotNull] byte[] bytes, int byteIndex, int byteCount, bool flush, out int charsUsed, out int bytesUsed, out bool completed)
+		public void Convert(string chars, int charIndex, int charCount, byte[] bytes, int byteIndex, int byteCount, bool flush, out int charsUsed, out int bytesUsed, out bool completed)
 		{
 			if (bytes == null) throw new NullReferenceException(nameof(bytes));
 			if (byteIndex < 0) throw new ArgumentOutOfRangeException(nameof(byteIndex));
@@ -410,11 +408,11 @@ namespace deniszykov.BaseN
 			}
 			else if (typeof(InputT) == typeof(ByteSafePtr))
 			{
-				inputBytePtr = (byte*)(ByteSafePtr)(object)input;
+				inputBytePtr = (byte*)(ByteSafePtr)(object)input!;
 			}
 			else if (typeof(InputT) == typeof(CharSafePtr))
 			{
-				inputCharPtr = (char*)(CharSafePtr)(object)input;
+				inputCharPtr = (char*)(CharSafePtr)(object)input!;
 			}
 			else
 			{
@@ -431,11 +429,11 @@ namespace deniszykov.BaseN
 			}
 			else if (typeof(OutputT) == typeof(ByteSafePtr))
 			{
-				outputBytePtr = (byte*)(ByteSafePtr)(object)output;
+				outputBytePtr = (byte*)(ByteSafePtr)(object)output!;
 			}
 			else if (typeof(OutputT) == typeof(CharSafePtr))
 			{
-				outputCharPtr = (char*)(CharSafePtr)(object)output;
+				outputCharPtr = (char*)(CharSafePtr)(object)output!;
 			}
 			else
 			{
@@ -465,15 +463,15 @@ namespace deniszykov.BaseN
 #else
 					if (typeof(InputT) == typeof(byte[]))
 					{
-						baseNCode = inputBytes[inputOffset + inputUsed++];
+						baseNCode = inputBytes![inputOffset + inputUsed++];
 					}
 					if (typeof(InputT) == typeof(char[]))
 					{
-						baseNCode = inputChars[inputOffset + inputUsed++];
+						baseNCode = inputChars![inputOffset + inputUsed++];
 					}
 					if (typeof(InputT) == typeof(string))
 					{
-						baseNCode = inputString[inputOffset + inputUsed++];
+						baseNCode = inputString![inputOffset + inputUsed++];
 					}
 					if (typeof(InputT) == typeof(ByteSafePtr))
 					{
@@ -529,7 +527,7 @@ namespace deniszykov.BaseN
 				{
 					for (i = 0; i < outputSize; i++)
 					{
-						outputBytes[outputOffset + outputUsed + (outputSize - 1 - i)] = (byte)(outputBlock & 0xFF);
+						outputBytes![outputOffset + outputUsed + (outputSize - 1 - i)] = (byte)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}
@@ -537,7 +535,7 @@ namespace deniszykov.BaseN
 				{
 					for (i = 0; i < outputSize; i++)
 					{
-						outputChars[outputOffset + outputUsed + (outputSize - 1 - i)] = (char)(outputBlock & 0xFF);
+						outputChars![outputOffset + outputUsed + (outputSize - 1 - i)] = (char)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}

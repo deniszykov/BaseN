@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
-using JetBrains.Annotations;
+
+// ReSharper disable InconsistentNaming
+#pragma warning disable 1572 // XML Doc missing referenced parameter
 
 namespace deniszykov.BaseN
 {
@@ -15,9 +17,9 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="stream">Output stream in which encoded data are written.</param>
 		/// <param name="baseNAlphabet">Encoding alphabet.</param>
+		/// <param name="leaveOpen">Leave <paramref name="stream"/> open when returned <see cref="Stream"/> is closed.</param>
 		/// <returns>Write-only encoding stream.</returns>
-		[NotNull]
-		public static Stream BaseNEncode([NotNull] this Stream stream, [NotNull] BaseNAlphabet baseNAlphabet
+		public static Stream BaseNEncode(this Stream stream, BaseNAlphabet baseNAlphabet
 #if NETCOREAPP
 			, bool leaveOpen = false
 #endif
@@ -37,9 +39,9 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="stream">Output stream in which encoded data are written.</param>
 		/// <param name="baseNEncoding">Encoding alphabet.</param>
+		/// <param name="leaveOpen">Leave <paramref name="stream"/> open when returned <see cref="Stream"/> is closed.</param>
 		/// <returns>Write-only encoding stream.</returns>
-		[NotNull]
-		public static Stream BaseNEncode([NotNull] this Stream stream, [NotNull] BaseNEncoding baseNEncoding
+		public static Stream BaseNEncode(this Stream stream, BaseNEncoding baseNEncoding
 #if NETCOREAPP
 			, bool leaveOpen = false
 #endif
@@ -60,9 +62,9 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="stream">Input stream with encoded data.</param>
 		/// <param name="baseNAlphabet">Decoding alphabet.</param>
+		/// <param name="leaveOpen">Leave <paramref name="stream"/> open when returned <see cref="Stream"/> is closed.</param>
 		/// <returns>Read-only decoding stream.</returns>
-		[NotNull]
-		public static Stream BaseNDecode([NotNull] this Stream stream, [NotNull] BaseNAlphabet baseNAlphabet
+		public static Stream BaseNDecode(this Stream stream, BaseNAlphabet baseNAlphabet
 #if NETCOREAPP
 			, bool leaveOpen = false
 #endif
@@ -83,9 +85,9 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="stream">Input stream with encoded data.</param>
 		/// <param name="baseNEncoding">Decoding alphabet.</param>
+		/// <param name="leaveOpen">Leave <paramref name="stream"/> open when returned <see cref="Stream"/> is closed.</param>
 		/// <returns>Read-only decoding stream.</returns>
-		[NotNull]
-		public static Stream BaseNDecode([NotNull] this Stream stream, [NotNull] BaseNEncoding baseNEncoding
+		public static Stream BaseNDecode(this Stream stream, BaseNEncoding baseNEncoding
 #if NETCOREAPP
 			, bool leaveOpen = false
 #endif

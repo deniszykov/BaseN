@@ -28,8 +28,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="bytes">Byte array to encode.</param>
 		/// <returns>ZBase32-encoded string.</returns>
-		[NotNull]
-		public static string ToString([NotNull] byte[] bytes)
+		public static string ToString(byte[] bytes)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
@@ -42,8 +41,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Encode start index in <paramref name="bytes"/>.</param>
 		/// <param name="count">Number of bytes to encode in <paramref name="bytes"/>.</param>
 		/// <returns>ZBase32-encoded string.</returns>
-		[NotNull]
-		public static string ToString([NotNull] byte[] bytes, int offset, int count)
+		public static string ToString(byte[] bytes, int offset, int count)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -59,8 +57,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="bytes">Byte array to encode.</param>
 		/// <returns>ZBase32-encoded char array.</returns>
-		[NotNull]
-		public static char[] ToCharArray([NotNull] byte[] bytes)
+		public static char[] ToCharArray(byte[] bytes)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
@@ -73,8 +70,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Encode start index in <paramref name="bytes"/>.</param>
 		/// <param name="count">Number of bytes to encode in <paramref name="bytes"/>.</param>
 		/// <returns>ZBase32-encoded char array.</returns>
-		[NotNull]
-		public static char[] ToCharArray([NotNull] byte[] bytes, int offset, int count)
+		public static char[] ToCharArray(byte[] bytes, int offset, int count)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -91,8 +87,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="zBase32Chars">Char array contains ZBase32 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] char[] zBase32Chars)
+		public static byte[] ToBytes(char[] zBase32Chars)
 		{
 			if (zBase32Chars == null) throw new ArgumentNullException(nameof(zBase32Chars));
 
@@ -105,8 +100,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="zBase32Chars"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="zBase32Chars"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] char[] zBase32Chars, int offset, int count)
+		public static byte[] ToBytes(char[] zBase32Chars, int offset, int count)
 		{
 			if (zBase32Chars == null) throw new ArgumentNullException(nameof(zBase32Chars));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -122,8 +116,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="zBase32String">ZBase32 string contains ZBase32 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] string zBase32String)
+		public static byte[] ToBytes(string zBase32String)
 		{
 			if (zBase32String == null) throw new ArgumentNullException(nameof(zBase32String));
 
@@ -136,8 +129,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="zBase32String"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="zBase32String"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] string zBase32String, int offset, int count)
+		public static byte[] ToBytes(string zBase32String, int offset, int count)
 		{
 			if (zBase32String == null) throw new ArgumentNullException(nameof(zBase32String));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -153,8 +145,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="zBase32Chars">Char array contains ZBase32 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] byte[] zBase32Chars)
+		public static byte[] ToBytes(byte[] zBase32Chars)
 		{
 			if (zBase32Chars == null) throw new ArgumentNullException(nameof(zBase32Chars));
 
@@ -167,8 +158,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="zBase32Chars"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="zBase32Chars"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] byte[] zBase32Chars, int offset, int count)
+		public static byte[] ToBytes(byte[] zBase32Chars, int offset, int count)
 		{
 			if (zBase32Chars == null) throw new ArgumentNullException(nameof(zBase32Chars));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));

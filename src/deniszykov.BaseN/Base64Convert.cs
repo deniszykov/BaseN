@@ -10,8 +10,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 using JetBrains.Annotations;
 
 namespace deniszykov.BaseN
@@ -28,8 +26,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="bytes">Byte array to encode.</param>
 		/// <returns>Base64-encoded string.</returns>
-		[NotNull]
-		public static string ToString([NotNull] byte[] bytes)
+		public static string ToString(byte[] bytes)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
@@ -42,8 +39,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Encode start index in <paramref name="bytes"/>.</param>
 		/// <param name="count">Number of bytes to encode in <paramref name="bytes"/>.</param>
 		/// <returns>Base64-encoded string.</returns>
-		[NotNull]
-		public static string ToString([NotNull] byte[] bytes, int offset, int count)
+		public static string ToString(byte[] bytes, int offset, int count)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -59,8 +55,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="bytes">Byte array to encode.</param>
 		/// <returns>Base64-encoded char array.</returns>
-		[NotNull]
-		public static char[] ToCharArray([NotNull] byte[] bytes)
+		public static char[] ToCharArray(byte[] bytes)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 
@@ -73,8 +68,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Encode start index in <paramref name="bytes"/>.</param>
 		/// <param name="count">Number of bytes to encode in <paramref name="bytes"/>.</param>
 		/// <returns>Base64-encoded char array.</returns>
-		[NotNull]
-		public static char[] ToCharArray([NotNull] byte[] bytes, int offset, int count)
+		public static char[] ToCharArray(byte[] bytes, int offset, int count)
 		{
 			if (bytes == null) throw new ArgumentNullException(nameof(bytes));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -91,8 +85,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="base64Chars">Char array contains Base64 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] char[] base64Chars)
+		public static byte[] ToBytes(char[] base64Chars)
 		{
 			if (base64Chars == null) throw new ArgumentNullException(nameof(base64Chars));
 
@@ -105,8 +98,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="base64Chars"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="base64Chars"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] char[] base64Chars, int offset, int count)
+		public static byte[] ToBytes(char[] base64Chars, int offset, int count)
 		{
 			if (base64Chars == null) throw new ArgumentNullException(nameof(base64Chars));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -122,8 +114,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="base64String">Base64 string contains Base64 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] string base64String)
+		public static byte[] ToBytes(string base64String)
 		{
 			if (base64String == null) throw new ArgumentNullException(nameof(base64String));
 
@@ -136,8 +127,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="base64String"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="base64String"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] string base64String, int offset, int count)
+		public static byte[] ToBytes(string base64String, int offset, int count)
 		{
 			if (base64String == null) throw new ArgumentNullException(nameof(base64String));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
@@ -153,8 +143,7 @@ namespace deniszykov.BaseN
 		/// </summary>
 		/// <param name="base64Chars">Char array contains Base64 encoded bytes.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] byte[] base64Chars)
+		public static byte[] ToBytes(byte[] base64Chars)
 		{
 			if (base64Chars == null) throw new ArgumentNullException(nameof(base64Chars));
 
@@ -167,8 +156,7 @@ namespace deniszykov.BaseN
 		/// <param name="offset">Decode start index in <paramref name="base64Chars"/>.</param>
 		/// <param name="count">Number of chars to decode in <paramref name="base64Chars"/>.</param>
 		/// <returns>Decoded bytes.</returns>
-		[NotNull]
-		public static byte[] ToBytes([NotNull] byte[] base64Chars, int offset, int count)
+		public static byte[] ToBytes(byte[] base64Chars, int offset, int count)
 		{
 			if (base64Chars == null) throw new ArgumentNullException(nameof(base64Chars));
 			if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
