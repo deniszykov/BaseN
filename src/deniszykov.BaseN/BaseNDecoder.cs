@@ -500,7 +500,7 @@ namespace deniszykov.BaseN
 					for (i = 0; i < inputBlockSize; i++)
 					{
 						inputBlock <<= 8;
-						inputBlock |= inputBytePtr[inputOffset++];
+						inputBlock |= inputBytePtr![inputOffset++];
 					}
 				}
 				if (typeof(InputT) == typeof(CharSafePtr))
@@ -508,7 +508,7 @@ namespace deniszykov.BaseN
 					for (i = 0; i < inputBlockSize; i++)
 					{
 						inputBlock <<= 8;
-						inputBlock |= inputCharPtr[inputOffset++];
+						inputBlock |= inputCharPtr![inputOffset++];
 					}
 				}
 #endif
@@ -566,7 +566,7 @@ namespace deniszykov.BaseN
 
 					for (i = 0; i < outputBlockSize; i++)
 					{
-						outputBytePtr[outputOffset++] = (byte)(outputBlock & 0xFF);
+						outputBytePtr![outputOffset++] = (byte)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}
@@ -576,7 +576,7 @@ namespace deniszykov.BaseN
 
 					for (i = 0; i < outputBlockSize; i++)
 					{
-						outputCharPtr[outputOffset++] = (char)(outputBlock & 0xFF);
+						outputCharPtr![outputOffset++] = (char)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}
@@ -722,7 +722,7 @@ namespace deniszykov.BaseN
 
 				for (i = 0; i < finalOutputBlockSize; i++)
 				{
-					outputBytePtr[outputOffset++] = (byte)(outputBlock & 0xFF);
+					outputBytePtr![outputOffset++] = (byte)(outputBlock & 0xFF);
 					outputBlock >>= 8;
 				}
 			}
@@ -732,7 +732,7 @@ namespace deniszykov.BaseN
 
 				for (i = 0; i < finalOutputBlockSize; i++)
 				{
-					outputCharPtr[outputOffset++] = (char)(outputBlock & 0xFF);
+					outputCharPtr![outputOffset++] = (char)(outputBlock & 0xFF);
 					outputBlock >>= 8;
 				}
 			}

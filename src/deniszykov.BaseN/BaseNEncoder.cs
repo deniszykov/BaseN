@@ -475,11 +475,11 @@ namespace deniszykov.BaseN
 					}
 					if (typeof(InputT) == typeof(ByteSafePtr))
 					{
-						baseNCode = inputBytePtr[inputOffset + inputUsed++];
+						baseNCode = inputBytePtr![inputOffset + inputUsed++];
 					}
 					if (typeof(InputT) == typeof(CharSafePtr))
 					{
-						baseNCode = inputCharPtr[inputOffset + inputUsed++];
+						baseNCode = inputCharPtr![inputOffset + inputUsed++];
 					}
 #endif
 					inputCount--;
@@ -543,7 +543,7 @@ namespace deniszykov.BaseN
 				{
 					for (i = 0; i < outputSize; i++)
 					{
-						outputBytePtr[outputOffset + outputUsed + (outputSize - 1 - i)] = (byte)(outputBlock & 0xFF);
+						outputBytePtr![outputOffset + outputUsed + (outputSize - 1 - i)] = (byte)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}
@@ -551,7 +551,7 @@ namespace deniszykov.BaseN
 				{
 					for (i = 0; i < outputSize; i++)
 					{
-						outputCharPtr[outputOffset + outputUsed + (outputSize - 1 - i)] = (char)(outputBlock & 0xFF);
+						outputCharPtr![outputOffset + outputUsed + (outputSize - 1 - i)] = (char)(outputBlock & 0xFF);
 						outputBlock >>= 8;
 					}
 				}
