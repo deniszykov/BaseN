@@ -20,9 +20,19 @@ namespace deniszykov.BaseN
 	/// Converts bytes to Base16 (aka Hexadecimal aka Hex) string and vice versa conversion method.
 	/// Reference: https://en.wikipedia.org/wiki/Hexadecimal
 	/// </summary>
-	[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+	[PublicAPI]
 	public static class HexConvert
 	{
+		/// <summary>
+		/// Encoder/decoder class for Base16 (aka Hexadecimal aka Hex) lowercase alphabet. Used for streaming.
+		/// </summary>
+		public static readonly BaseNEncoding EncodingLowerCase = BaseNEncoding.Base16LowerCase; 
+		
+		/// <summary>
+		/// Encoder/decoder class for Base16 (aka Hexadecimal aka Hex) lowercase alphabet. Used for streaming.
+		/// </summary>
+		public static readonly BaseNEncoding EncodingUpperCase = BaseNEncoding.Base16UpperCase;
+		
 		/// <summary>
 		/// Encode byte array to Base16 string.
 		/// </summary>
@@ -52,7 +62,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return string.Empty;
 
-			return (lowerCase ? BaseNEncoding.Base16LowerCase : BaseNEncoding.Base16UpperCase).GetString(bytes, offset, count);
+			return (lowerCase ? EncodingLowerCase : EncodingUpperCase).GetString(bytes, offset, count);
 		}
 		/// <summary>
 		/// Encode byte array to Base16 char array.
@@ -83,7 +93,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new char[0];
 
-			return (lowerCase ? BaseNEncoding.Base16LowerCase : BaseNEncoding.Base16UpperCase).GetChars(bytes, offset, count);
+			return (lowerCase ? EncodingLowerCase : EncodingUpperCase).GetChars(bytes, offset, count);
 		}
 
 		/// <summary>
@@ -122,7 +132,7 @@ namespace deniszykov.BaseN
 				}
 			}
 
-			return (isLowerCase ? BaseNEncoding.Base16LowerCase : BaseNEncoding.Base16UpperCase).GetBytes(base16Chars, offset, count);
+			return (isLowerCase ? EncodingLowerCase : EncodingUpperCase).GetBytes(base16Chars, offset, count);
 		}
 		/// <summary>
 		/// Decode Base16 string into byte array.
@@ -160,7 +170,7 @@ namespace deniszykov.BaseN
 				}
 			}
 
-			return (isLowerCase ? BaseNEncoding.Base16LowerCase : BaseNEncoding.Base16UpperCase).GetBytes(base16String, offset, count);
+			return (isLowerCase ? EncodingLowerCase : EncodingUpperCase).GetBytes(base16String, offset, count);
 		}
 		/// <summary>
 		/// Decode Base16 char array (in ASCII encoding) into byte array.
@@ -198,7 +208,7 @@ namespace deniszykov.BaseN
 				}
 			}
 
-			var encoder = (BaseNEncoder)(isLowerCase ? BaseNEncoding.Base16LowerCase : BaseNEncoding.Base16UpperCase).GetEncoder();
+			var encoder = (isLowerCase ? EncodingLowerCase.Encoder : EncodingUpperCase.Encoder);
 			var outputCount = encoder.GetByteCount(base16Chars, offset, count, flush: true);
 			var output = new byte[outputCount];
 			encoder.Convert(base16Chars, offset, count, output, 0, outputCount, true, out var inputUsed, out var outputUsed, out _);

@@ -16,7 +16,7 @@ namespace deniszykov.BaseN
 	/// <summary>
 	/// Base64 encoding/decoding alphabet.
 	/// </summary>
-	[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+	[PublicAPI]
 	public sealed class BaseNAlphabet
 	{
 		// ReSharper disable StringLiteralTypo

@@ -18,9 +18,14 @@ namespace deniszykov.BaseN
 	/// Converts bytes to Base64 string and vice versa conversion method.
 	/// Reference: https://en.wikipedia.org/wiki/Base64
 	/// </summary>
-	[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+	[PublicAPI]
 	public static class Base64Convert
 	{
+		/// <summary>
+		/// Encoder/decoder class for Base64 alphabet. Used for streaming.
+		/// </summary>
+		public static readonly BaseNEncoding Encoding = BaseNEncoding.Base64; 
+		
 		/// <summary>
 		/// Encode byte array to Base64 string.
 		/// </summary>
@@ -48,7 +53,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return string.Empty;
 
-			return BaseNEncoding.Base64.GetString(bytes, offset, count);
+			return Encoding.GetString(bytes, offset, count);
 		}
 		/// <summary>
 		/// Encode byte array to Base64 char array.
@@ -77,7 +82,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new char[0];
 
-			return BaseNEncoding.Base64.GetChars(bytes, offset, count);
+			return Encoding.GetChars(bytes, offset, count);
 		}
 
 		/// <summary>
@@ -107,7 +112,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new byte[0];
 
-			return BaseNEncoding.Base64.GetBytes(base64Chars, offset, count);
+			return Encoding.GetBytes(base64Chars, offset, count);
 		}
 		/// <summary>
 		/// Decode Base64 string into byte array.
@@ -136,7 +141,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new byte[0];
 
-			return BaseNEncoding.Base64.GetBytes(base64String, offset, count);
+			return Encoding.GetBytes(base64String, offset, count);
 		}
 		/// <summary>
 		/// Decode Base64 char array (in ASCII encoding) into byte array.
@@ -165,7 +170,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new byte[0];
 
-			var encoder = (BaseNEncoder)BaseNEncoding.Base64.GetEncoder();
+			var encoder = Encoding.Encoder;
 			var outputCount = encoder.GetByteCount(base64Chars, offset, count, flush: true);
 			var output = new byte[outputCount];
 			encoder.Convert(base64Chars, offset, count, output, 0, outputCount, true, out var inputUsed, out var outputUsed, out _);

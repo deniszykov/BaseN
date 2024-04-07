@@ -20,9 +20,14 @@ namespace deniszykov.BaseN
 	/// Converts bytes to ZBase32 string and vice versa conversion method.
 	/// Reference: https://en.wikipedia.org/wiki/Base32#z-base-32
 	/// </summary>
-	[UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+	[PublicAPI]
 	public static class ZBase32Convert
 	{
+		/// <summary>
+		/// Encoder/decoder class for ZBase32 alphabet. Used for streaming.
+		/// </summary>
+		public static readonly BaseNEncoding Encoding = BaseNEncoding.ZBase32; 
+		
 		/// <summary>
 		/// Encode byte array to ZBase32 string.
 		/// </summary>
@@ -50,7 +55,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return string.Empty;
 
-			return BaseNEncoding.ZBase32.GetString(bytes, offset, count);
+			return Encoding.GetString(bytes, offset, count);
 		}
 		/// <summary>
 		/// Encode byte array to ZBase32 char array.
@@ -79,7 +84,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new char[0];
 
-			return BaseNEncoding.ZBase32.GetChars(bytes, offset, count);
+			return Encoding.GetChars(bytes, offset, count);
 		}
 
 		/// <summary>
@@ -109,7 +114,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new byte[0];
 
-			return BaseNEncoding.ZBase32.GetBytes(zBase32Chars, offset, count);
+			return Encoding.GetBytes(zBase32Chars, offset, count);
 		}
 		/// <summary>
 		/// Decode ZBase32 string into byte array.
@@ -138,7 +143,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new byte[0];
 
-			return BaseNEncoding.ZBase32.GetBytes(zBase32String, offset, count);
+			return Encoding.GetBytes(zBase32String, offset, count);
 		}
 		/// <summary>
 		/// Decode ZBase32 char array (in ASCII encoding) into byte array.
@@ -167,7 +172,7 @@ namespace deniszykov.BaseN
 
 			if (count == 0) return new byte[0];
 
-			var encoder = (BaseNEncoder)BaseNEncoding.ZBase32.GetEncoder();
+			var encoder = Encoding.Encoder;
 			var outputCount = encoder.GetByteCount(zBase32Chars, offset, count, flush: true);
 			var output = new byte[outputCount];
 			encoder.Convert(zBase32Chars, offset, count, output, 0, outputCount, true, out var inputUsed, out var outputUsed, out _);

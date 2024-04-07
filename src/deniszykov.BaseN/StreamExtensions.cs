@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using JetBrains.Annotations;
 
 // ReSharper disable InconsistentNaming
 #pragma warning disable 1572 // XML Doc missing referenced parameter
@@ -10,6 +11,7 @@ namespace deniszykov.BaseN
 	/// <summary>
 	/// Stream extensions.
 	/// </summary>
+	[PublicAPI]
 	public static class StreamExtensions
 	{
 		/// <summary>

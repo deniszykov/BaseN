@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace deniszykov.BaseN
 {
@@ -11,6 +12,7 @@ namespace deniszykov.BaseN
 	/// Base-(Alphabet Length) binary data decoder (!) based on specified <see cref="Alphabet"/>.
 	/// Class named "Encoder" because it is based on <see cref="Encoder"/>, but it is effectively decoder.
 	/// </summary>
+	[PublicAPI]
 	public sealed class BaseNEncoder : Encoder, ICryptoTransform
 	{
 		public BaseNAlphabet Alphabet { get; }
@@ -65,6 +67,25 @@ namespace deniszykov.BaseN
 			var bytesCount = (int)checked((ulong)count * (ulong)bitsPerInputChar / 8);
 			return bytesCount;
 		}
+		
+#if NETSTANDARD || NET461
+		/// <summary>
+		/// See description on similar conversion methods. This is just overload with different buffer types.
+		/// </summary>
+		public unsafe int GetByteCount(ReadOnlySpan<char> chars, bool flush)
+		{
+			if (chars.Length == 0)
+			{
+				return 0;
+			}
+			
+			fixed (char* charsPtr = chars)
+			{
+				return this.GetByteCount(charsPtr, chars.Length, flush);
+			}
+		}
+#endif
+		
 #if NETSTANDARD1_6
 		/// <summary>
 		/// See description on similar conversion methods. This is just overload with different buffer types.
@@ -184,6 +205,27 @@ namespace deniszykov.BaseN
 			this.Convert(chars, charIndex, charCount, bytes, byteIndex, bytes.Length - byteIndex, flush, out _, out var bytesUsed, out _);
 			return bytesUsed;
 		}
+		
+#if NETSTANDARD || NET461
+		/// <summary>
+		/// See description on similar conversion methods. This is just overload with different buffer types.
+		/// </summary>
+		public unsafe int GetBytes(ReadOnlySpan<char> chars, Span<byte> bytes, bool flush)
+		{
+			if (bytes.Length == 0 || chars.Length == 0)
+			{
+				return 0;
+			}
+			
+			fixed (byte* bytesPtr = bytes)
+			{	
+				fixed (char* charsPtr = chars)
+				{
+					return this.GetBytes(charsPtr, chars.Length, bytesPtr, bytes.Length, flush);
+				}
+			}
+		}
+#endif
 #if NETSTANDARD1_6
 		/// <summary>
 		/// See description on similar conversion methods. This is just overload with different buffer types.
@@ -212,6 +254,30 @@ namespace deniszykov.BaseN
 			return outputBuffer;
 		}
 
+#if NETSTANDARD || NET461
+		/// <summary>
+		/// See other conversion methods for info.
+		/// </summary>
+		public unsafe void Convert(ReadOnlySpan<byte> chars, Span<byte> bytes, bool flush, out int charsUsed, out int bytesUsed, out bool completed)
+		{
+			if (chars.Length == 0 || bytes.Length == 0)
+			{
+				charsUsed = 0;
+				bytesUsed = 0;
+				completed = true;
+				return;
+			}
+			
+			fixed (byte* bytesPtr = bytes)
+			{
+				fixed (byte* charsPtr = chars)
+				{
+					this.Convert(charsPtr, chars.Length, bytesPtr, bytes.Length, flush, out charsUsed, out bytesUsed, out completed);
+				}
+			}
+		}
+#endif
+		
 		/// <summary>
 		/// See other conversion methods for info.
 		/// </summary>
@@ -228,6 +294,29 @@ namespace deniszykov.BaseN
 			this.DecodeInternal((ByteSafePtr)chars, 0, charCount, (ByteSafePtr)bytes, 0, byteCount, flush, out charsUsed, out bytesUsed, out completed);
 #endif
 		}
+#if NETSTANDARD || NET461
+		/// <summary>
+		/// See other conversion methods for info.
+		/// </summary>
+		public unsafe void Convert(ReadOnlySpan<char> chars, Span<byte> bytes, bool flush, out int charsUsed, out int bytesUsed, out bool completed)
+		{
+			if (chars.Length == 0 || bytes.Length == 0)
+			{
+				charsUsed = 0;
+				bytesUsed = 0;
+				completed = true;
+				return;
+			}
+			
+			fixed (byte* bytesPtr = bytes)
+			{
+				fixed (char* charsPtr = chars)
+				{
+					this.Convert(charsPtr, chars.Length, bytesPtr, bytes.Length, flush, out charsUsed, out bytesUsed, out completed);
+				}
+			}
+		}
+#endif
 #if NETSTANDARD1_6
 		/// <summary>
 		/// 
