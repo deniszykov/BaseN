@@ -8,7 +8,7 @@ Also there is an implementation of `System.Text.Encoding` which provides complex
 
 (Un)desired feature of this library, any invalid symbols (e.g. line breaks) during decoding are ignored.  
 
-Supported encoding alphabets are `Base16` aka `Hex`, `Base32`, `ZBase32`, `Base64`, `Base64` Url-safe.  
+Supported encoding alphabets are `Base16` aka `Hex`, `Base32`, `ZBase32`, `Base64`, `Base64Url`.  
 
 Installation
 ============
